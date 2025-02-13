@@ -38,42 +38,25 @@ struct Hello : public ModulePass {
     }
 
     bool findIndirectJump(Module &M) {
-        // Iterate over all instructions in the module
         for (auto &F : M) {
             for (auto &BB : F) {
                 for (auto &I : BB) {
-                    /* Check for Call or Invoke instructions */
-                    // e.g., if (I is an indirect call) {  
                     if(auto *CB = dyn_cast<CallBase>(&I)){
-                        /* Get the callee operand (The target to be invoked) */
-                            //get the callee operand (the target being called)
                             Value *CalledOperand = CB->getCalledOperand();
-                            // Check if the callee operand is a function pointer
                             if(!isa<Function>(CalledOperand)){
                                 errs() << "Indirect call found in function: " << F.getName() << "\n";
-                                  // Get the function type of the indirect call
-                                  // e.g., FuncType = dyn_cast<FunctionType>(Call->getFunctionType());
                                 FunctionType *FuncType = CB->getFunctionType();
 
-                                 // Iterate over all functions in the module and find the functioins with matched signature
                                 for (auto &Func : M.functions()) {
-                                    /* Match function signature */
-                                    // e.g., if (Func.getFunctionType() == FuncType) {
                                     if(Func.getFunctionType()==FuncType){
                                         errs() << "Potential target: " << Func.getName() << "\n"; 
                                         
-
-                                        /* Store the valid transition into the Map src2dstMap */
-                                        if (!Func.empty()) { // Ensure the function has an entry block.
+                                        if (!Func.empty()) { 
                                              BasicBlock *EntryBB = &Func.getEntryBlock();
 
-                                            // Retrieve the IDs for the current basic block (source) and the target's entry block (destination).
                                             int srcID = BBIDMap[&BB];
                                             int dstID = BBIDMap[EntryBB];
 
-                                             // Record the allowed transition in the map.
-                                            // For a given source basic block (srcID), we add the destination ID (dstID)
-                                            // to the vector of allowed targets.
                                             src2dstMap[srcID].push_back(dstID);
                                         }
                                     }
