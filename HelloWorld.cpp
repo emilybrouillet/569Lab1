@@ -29,7 +29,6 @@ struct Hello : public ModulePass {
         int id = 0;
         for (auto &F : M) {
             for (auto &BB : F) {
-                /* Assign a ID for each blocks */
                 BBIDMap[&BB] = id;
                 id++;
             }
@@ -73,7 +72,6 @@ struct Hello : public ModulePass {
     // This function retrieves the `initCFG` function from the module, or declares
     Function *getInitCFGFunction(Module *M) {
         static const std::string InitCFGName = "initCFG";
-        // Check if the function already exists in the module
         if (Function *F = M->getFunction(InitCFGName)) {
             return F;
         }
